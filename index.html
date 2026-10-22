@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dining Pass</title>
+<meta name="description" content="Turn your dining hall QR screenshot into an Apple Wallet pass.">
+<meta name="theme-color" content="#162b4d">
+<style>
+  :root {
+    --bg: #f4f6fa; --card: #ffffff; --ink: #121826; --muted: #5b6475;
+    --navy: #162b4d; --line: #e3e7ef; --ok: #127a4a; --err: #b42318;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0d1117; --card: #161b24; --ink: #eef1f6; --muted: #9aa3b2; --line: #262d3a; --ok: #46c08a; --err: #ff7a6b; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 440px; margin: 0 auto; padding: 40px 16px 48px; }
+  .badge {
+    width: 56px; height: 56px; border-radius: 14px; background: var(--navy); color: #fff;
+    display: grid; place-items: center; font-weight: 800; font-size: 28px; margin-bottom: 20px;
+  }
+  h1 { font-size: 30px; line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.02em; }
+  .lede { color: var(--muted); font-size: 17px; line-height: 1.45; margin: 0 0 28px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+  .upload {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    border: 2px dashed var(--line); border-radius: 14px; padding: 32px 16px; cursor: pointer;
+    text-align: center; color: var(--muted); font-size: 15px;
+  }
+  .upload strong { color: var(--ink); font-size: 17px; }
+  input[type=file] { display: none; }
+  .status { margin-top: 16px; font-size: 15px; min-height: 22px; }
+  .status.ok { color: var(--ok); } .status.err { color: var(--err); }
+  .found { display: none; margin-top: 18px; }
+  .found img { width: 100%; border-radius: 12px; border: 1px solid var(--line); max-height: 220px; object-fit: contain; background: #fff; }
+  .code { font-family: ui-monospace, Menlo, monospace; font-size: 15px; margin: 12px 0 16px; color: var(--muted); }
+  .wallet {
+    width: 100%; height: 52px; border: 0; border-radius: 12px; background: #000; color: #fff;
+    font-size: 17px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  @media (prefers-color-scheme: dark) { .wallet { background: #fff; color: #000; } }
+  .wallet:disabled { opacity: 0.5; }
+  .again { display: block; margin: 14px auto 0; background: none; border: 0; color: var(--muted); font-size: 15px; text-decoration: underline; cursor: pointer; }
+  .note { display: none; margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+  .privacy { margin-top: 28px; font-size: 14px; color: var(--muted); line-height: 1.5; }
+  .privacy h2 { font-size: 15px; color: var(--ink); margin: 0 0 6px; }
+  .privacy ul { margin: 0; padding-left: 18px; }
+  footer { margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <div class="badge" aria-hidden="true">D</div>
+  <h1>Your dining QR, in Apple Wallet.</h1>
+  <p class="lede">Upload the screenshot you already use. Get a Wallet pass you can pull up with a double-click.</p>
+
+  <div class="card">
+    <label class="upload" id="drop">
+      <strong>Choose screenshot</strong>
+      <span>Pick the photo of your dining hall QR code</span>
+      <input type="file" id="file" accept="image/*">
+    </label>
+
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+
+    <div class="found" id="found">
+      <img id="preview" alt="Your screenshot">
+      <div class="code" id="codeShown"></div>
+      <form id="passForm" method="POST" action="/api/pass">
+        <input type="hidden" name="code" id="codeField">
+        <button class="wallet" id="walletBtn" type="submit">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18" stroke="currentColor" stroke-width="2"/></svg>
+          Add to Apple Wallet
+        </button>
+      </form>
+      <button class="again" id="again" type="button">Use a different screenshot</button>
+    </div>
+  </div>
+
+  <div class="note" id="iosNote">Open this page in Safari on your iPhone to add the pass to Wallet.</div>
+
+  <section class="privacy">
+    <h2>What happens to your data</h2>
+    <ul>
+      <li>Your screenshot is read on your phone and never uploaded.</li>
+      <li>Only the code inside the QR is sent, once, to sign the pass.</li>
+      <li>Nothing is saved, logged, or shared. The code is open source so anyone can check.</li>
+    </ul>
+  </section>
+
+  <footer>Student-made tool. Not an official university product.</footer>
+</main>
+
+<script src="/jsQR.js"></script>
+<script>
+(function () {
+  // Keep this in sync with CODE_PATTERN on the server.
+  var CODE_PATTERN = /^[A-Za-z0-9_\-]{4,64}$/;
+
+  var fileInput = document.getElementById("file");
+  var statusEl = document.getElementById("status");
+  var found = document.getElementById("found");
+  var preview = document.getElementById("preview");
+  var codeShown = document.getElementById("codeShown");
+  var codeField = document.getElementById("codeField");
+  var walletBtn = document.getElementById("walletBtn");
+  var drop = document.getElementById("drop");
+  var objectUrl = null;
+
+  var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (!isIOS) document.getElementById("iosNote").style.display = "block";
+
+  function setStatus(msg, kind) {
+    statusEl.textContent = msg;
+    statusEl.className = "status" + (kind ? " " + kind : "");
+  }
+
+  function mask(code) {
+    if (code.length <= 4) return code;
+    return "•".repeat(code.length - 4) + code.slice(-4);
+  }
+
+  // Try a few sizes, since a small QR inside a full-screen screenshot can be missed at one scale.
+  function decode(img) {
+    var sizes = [1600, 1000, 2400, 700];
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d", { willReadFrequently: true });
+    for (var i = 0; i < sizes.length; i++) {
+      var scale = Math.min(1, sizes[i] / Math.max(img.naturalWidth, img.naturalHeight));
+      canvas.width = Math.round(img.naturalWidth * scale);
+      canvas.height = Math.round(img.naturalHeight * scale);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      var data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      var result = jsQR(data.data, data.width, data.height, { inversionAttempts: "attemptBoth" });
+      if (result && result.data) return result.data;
+    }
+    return null;
+  }
+
+  function reset() {
+    found.style.display = "none";
+    drop.style.display = "flex";
+    codeField.value = "";
+    fileInput.value = "";
+    if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+    setStatus("");
+  }
+
+  fileInput.addEventListener("change", function () {
+    var file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    setStatus("Reading your QR code…");
+    if (objectUrl) URL.revokeObjectURL(objectUrl);
+    objectUrl = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      var code = decode(img);
+      if (!code) {
+        setStatus("Couldn't find a QR code in that image. Try a sharper screenshot.", "err");
+        return;
+      }
+      code = code.trim();
+      if (!CODE_PATTERN.test(code)) {
+        setStatus("Found a QR code, but it doesn't look like a dining hall code.", "err");
+        return;
+      }
+      codeField.value = code;
+      codeShown.textContent = "Code found: " + mask(code);
+      preview.src = objectUrl;
+      drop.style.display = "none";
+      found.style.display = "block";
+      setStatus("Ready. Tap the button to add it to Wallet.", "ok");
+    };
+    img.onerror = function () { setStatus("That file isn't an image we can read.", "err"); };
+    img.src = objectUrl;
+  });
+
+  document.getElementById("passForm").addEventListener("submit", function () {
+    walletBtn.disabled = true;
+    setStatus("Making your pass…");
+    setTimeout(function () { walletBtn.disabled = false; setStatus("If Wallet didn't open, tap the button again.", ""); }, 6000);
+  });
+
+  document.getElementById("again").addEventListener("click", reset);
+})();
+</script>
+</body>
+</html>

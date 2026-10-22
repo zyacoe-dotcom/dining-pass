@@ -1,0 +1,11 @@
+{
+  "name": "dining-wallet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Turn a dining hall QR screenshot into an Apple Wallet pass. Stores nothing.",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "passkit-generator": "^3.7.0"
+  }
+}

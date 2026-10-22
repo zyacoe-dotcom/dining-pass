@@ -1,0 +1,28 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "pass.com.example.diningpass",
+  "teamIdentifier": "XXXXXXXXXX",
+  "organizationName": "Dining Pass",
+  "description": "Campus dining QR pass",
+  "backgroundColor": "rgb(22, 43, 77)",
+  "foregroundColor": "rgb(255, 255, 255)",
+  "labelColor": "rgb(190, 205, 230)",
+  "sharingProhibited": true,
+  "generic": {
+    "primaryFields": [
+      { "key": "title", "label": "SCAN AT", "value": "Dining Hall" }
+    ],
+    "backFields": [
+      {
+        "key": "privacy",
+        "label": "Privacy",
+        "value": "This pass was made from your own screenshot. The image never left your phone and no ID is stored anywhere."
+      },
+      {
+        "key": "about",
+        "label": "About",
+        "value": "Student-made tool. Not an official university product."
+      }
+    ]
+  }
+}

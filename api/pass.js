@@ -4,6 +4,7 @@
 //   - Never write anything to disk or a database.
 //   - Build the pass in memory, send it, forget it.
 
+const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { PKPass } = require("passkit-generator");
@@ -12,15 +13,28 @@ const { PKPass } = require("passkit-generator");
 // school's exact format (e.g. ^\d{7}$ for a 7-digit ID). Set CODE_PATTERN in Vercel.
 const CODE_PATTERN = new RegExp(process.env.CODE_PATTERN || "^[A-Za-z0-9_\\-]{4,64}$");
 
+// Pass template files, stored at the root of the repo.
+const MODEL_FILES = [
+  "pass.json",
+  "icon.png", "icon@2x.png", "icon@3x.png",
+  "logo.png", "logo@2x.png", "logo@3x.png",
+];
+
+function loadModel() {
+  const buffers = {};
+  for (const name of MODEL_FILES) {
+    buffers[name] = fs.readFileSync(path.join(process.cwd(), name));
+  }
+  return buffers;
+}
+
 // Best-effort rate limit: max 10 passes per IP per 10 minutes, per server instance.
-// Vercel's built-in firewall rate limiting is the stronger version (see SETUP.md).
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_PER_WINDOW = 10;
 const hits = new Map();
 
 function rateLimited(ip) {
   const now = Date.now();
-  // Store a hash, not the raw IP.
   const key = crypto.createHash("sha256").update(String(ip)).digest("hex").slice(0, 16);
   const entry = hits.get(key);
   if (!entry || now - entry.start > WINDOW_MS) {
@@ -43,8 +57,7 @@ function readCode(req) {
   let body = req.body;
   if (typeof body === "string") body = Object.fromEntries(new URLSearchParams(body));
   if (Buffer.isBuffer(body)) body = Object.fromEntries(new URLSearchParams(body.toString()));
-  const code = body && typeof body.code === "string" ? body.code.trim() : "";
-  return code;
+  return body && typeof body.code === "string" ? body.code.trim() : "";
 }
 
 function sendError(res, status, message) {
@@ -70,18 +83,15 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const pass = await PKPass.from(
+    const pass = new PKPass(
+      loadModel(),
       {
-        model: path.join(process.cwd(), "model.pass"),
-        certificates: {
-          wwdr: fromEnv("WWDR_CERT"),
-          signerCert: fromEnv("SIGNER_CERT"),
-          signerKey: fromEnv("SIGNER_KEY"),
-          signerKeyPassphrase: process.env.SIGNER_KEY_PASSPHRASE || undefined,
-        },
+        wwdr: fromEnv("WWDR_CERT"),
+        signerCert: fromEnv("SIGNER_CERT"),
+        signerKey: fromEnv("SIGNER_KEY"),
+        signerKeyPassphrase: process.env.SIGNER_KEY_PASSPHRASE || undefined,
       },
       {
-        // Random serial so the pass itself doesn't reveal or track the ID.
         serialNumber: crypto.randomUUID(),
         passTypeIdentifier: process.env.PASS_TYPE_ID,
         teamIdentifier: process.env.TEAM_ID,
@@ -101,7 +111,6 @@ module.exports = async function handler(req, res) {
     res.setHeader("Cache-Control", "no-store");
     res.end(buffer);
   } catch (err) {
-    // Log only the error type, never the code.
     console.error("pass_build_failed", err && err.message === "missing_config" ? "missing_config" : "sign_error");
     return sendError(res, 500, "Something went wrong making your pass. Try again later.");
   }

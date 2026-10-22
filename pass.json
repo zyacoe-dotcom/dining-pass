@@ -2,15 +2,19 @@
   "formatVersion": 1,
   "passTypeIdentifier": "pass.com.example.diningpass",
   "teamIdentifier": "XXXXXXXXXX",
-  "organizationName": "Dining Pass",
+  "organizationName": "Union Dining Pass",
   "description": "Campus dining QR pass",
-  "backgroundColor": "rgb(22, 43, 77)",
+  "backgroundColor": "rgb(153, 0, 38)",
   "foregroundColor": "rgb(255, 255, 255)",
-  "labelColor": "rgb(190, 205, 230)",
+  "labelColor": "rgb(255, 205, 215)",
   "sharingProhibited": true,
   "generic": {
     "primaryFields": [
-      { "key": "title", "label": "SCAN AT", "value": "Dining Hall" }
+      {
+        "key": "title",
+        "label": "SCAN AT",
+        "value": "Union Dining"
+      }
     ],
     "backFields": [
       {
@@ -21,7 +25,7 @@
       {
         "key": "about",
         "label": "About",
-        "value": "Student-made tool. Not an official university product."
+        "value": "Made by a Union student. Not an official Union University product."
       }
     ]
   }

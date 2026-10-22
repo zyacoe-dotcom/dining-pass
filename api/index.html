@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#990026">
 <style>
   :root {
-    --bg: #f4f6fa; --card: #ffffff; --ink: #121826; --muted: #5b6475;
+    --bg: #ffffff; --card: #ffffff; --ink: #121826; --muted: #5b6475;
     --navy: #990026; --line: #e3e7ef; --ok: #127a4a; --err: #b42318;
   }
   @media (prefers-color-scheme: dark) {
@@ -51,9 +51,7 @@
   .wallet:disabled { opacity: 0.5; }
   .again { display: block; margin: 14px auto 0; background: none; border: 0; color: var(--muted); font-size: 15px; text-decoration: underline; cursor: pointer; }
   .note { display: none; margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-size: 14px; color: var(--muted); }
-  .privacy { margin-top: 28px; font-size: 14px; color: var(--muted); line-height: 1.5; }
-  .privacy h2 { font-size: 15px; color: var(--ink); margin: 0 0 6px; }
-  .privacy ul { margin: 0; padding-left: 18px; }
+  .privacy { margin: 20px 0 0; font-size: 14px; color: var(--muted); text-align: center; line-height: 1.5; }
   footer { margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center; }
 </style>
 </head>
@@ -91,14 +89,7 @@
 
   <div class="note" id="iosNote">Open this page in Safari on your iPhone to add the pass to Wallet.</div>
 
-  <section class="privacy">
-    <h2>What happens to your data</h2>
-    <ul>
-      <li>Your screenshot is read on your phone and never uploaded.</li>
-      <li>Only the code inside the QR is sent, once, to sign the pass.</li>
-      <li>Nothing is saved, logged, or shared. The code is open source so anyone can check.</li>
-    </ul>
-  </section>
+  <p class="privacy">🔒 Your screenshot stays on your phone. Nothing gets saved.</p>
 
   <footer>Made by a Union student. Not an official Union University product.</footer>
 </main>

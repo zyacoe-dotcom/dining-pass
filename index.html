@@ -6,13 +6,11 @@
 <title>Union Dining Pass</title>
 <meta name="description" content="Turn your dining hall QR screenshot into an Apple Wallet pass.">
 <meta name="theme-color" content="#990026">
+<meta name="color-scheme" content="light">
 <style>
   :root {
-    --bg: #f4f6fa; --card: #ffffff; --ink: #121826; --muted: #5b6475;
+    --bg: #ffffff; --card: #ffffff; --ink: #121826; --muted: #5b6475;
     --navy: #990026; --line: #e3e7ef; --ok: #127a4a; --err: #b42318;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #0d1117; --card: #161b24; --ink: #eef1f6; --muted: #9aa3b2; --line: #262d3a; --ok: #46c08a; --err: #ff7a6b; }
   }
   * { box-sizing: border-box; }
   body {
@@ -28,15 +26,16 @@
   h1 { font-size: 30px; line-height: 1.15; margin: 0 0 10px; letter-spacing: -0.02em; }
   .lede { color: var(--muted); font-size: 17px; line-height: 1.45; margin: 0 0 28px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
-  .upload {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-    border: 2px dashed var(--line); border-radius: 14px; padding: 32px 16px; cursor: pointer;
-    text-align: center; color: var(--muted); font-size: 15px;
+  .upload { display: flex; flex-direction: column; gap: 12px; cursor: pointer; }
+  .upload .hint { color: var(--muted); font-size: 15px; text-align: center; }
+  .pick {
+    width: 100%; height: 52px; border-radius: 12px; background: #000; color: #fff;
+    font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;
   }
-  .upload strong { color: var(--navy); font-size: 17px; }
-  @media (prefers-color-scheme: dark) { .upload strong { color: #ff8fa6; } }
+  .upload:active .pick { opacity: 0.85; }
   input[type=file] { display: none; }
   .status { margin-top: 16px; font-size: 15px; min-height: 22px; }
+  .status:empty { display: none; }
   .status.ok { color: var(--ok); } .status.err { color: var(--err); }
   .found { display: none; margin-top: 18px; }
   .found img { width: 100%; border-radius: 12px; border: 1px solid var(--line); max-height: 220px; object-fit: contain; background: #fff; }
@@ -45,15 +44,16 @@
     width: 100%; height: 52px; border: 0; border-radius: 12px; background: #000; color: #fff;
     font-size: 17px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
   }
-  @media (prefers-color-scheme: dark) { .wallet { background: #fff; color: #000; } }
   .wallet:disabled { opacity: 0.5; }
   .again { display: block; margin: 14px auto 0; background: none; border: 0; color: var(--muted); font-size: 15px; text-decoration: underline; cursor: pointer; }
   .note { display: none; margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-size: 14px; color: var(--muted); }
-  .privacy { margin-top: 28px; font-size: 14px; color: var(--muted); line-height: 1.5; }
-  .privacy h2 { font-size: 15px; color: var(--ink); margin: 0 0 6px; }
-  .privacy ul { margin: 0; padding-left: 18px; }
+  .privacy { margin: 20px 0 0; font-size: 14px; color: var(--muted); text-align: center; line-height: 1.5; }
   footer { margin-top: 28px; font-size: 12px; color: var(--muted); text-align: center; }
 </style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 <main>
@@ -63,8 +63,11 @@
 
   <div class="card">
     <label class="upload" id="drop">
-      <strong>Choose screenshot</strong>
-      <span>Pick the photo of your dining hall QR code</span>
+      <span class="hint">Tap below, then pick your dining hall QR screenshot</span>
+      <span class="pick">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18" stroke="currentColor" stroke-width="2"/></svg>
+        Add to Apple Wallet
+      </span>
       <input type="file" id="file" accept="image/*">
     </label>
 
@@ -86,14 +89,7 @@
 
   <div class="note" id="iosNote">Open this page in Safari on your iPhone to add the pass to Wallet.</div>
 
-  <section class="privacy">
-    <h2>What happens to your data</h2>
-    <ul>
-      <li>Your screenshot is read on your phone and never uploaded.</li>
-      <li>Only the code inside the QR is sent, once, to sign the pass.</li>
-      <li>Nothing is saved, logged, or shared. The code is open source so anyone can check.</li>
-    </ul>
-  </section>
+  <p class="privacy">🔒 Your screenshot stays on your phone. Nothing gets saved.</p>
 
   <footer>Made by a Union student. Not an official Union University product.</footer>
 </main>
@@ -177,7 +173,13 @@
       preview.src = objectUrl;
       drop.style.display = "none";
       found.style.display = "block";
-      setStatus("Ready. Tap the button to add it to Wallet.", "ok");
+      setStatus("Opening Wallet…", "ok");
+      // Go straight to Wallet. The button below stays as a backup.
+      setTimeout(function () {
+        walletBtn.disabled = true;
+        document.getElementById("passForm").submit();
+        setTimeout(function () { walletBtn.disabled = false; setStatus("If Wallet didn't open, tap the button.", ""); }, 4000);
+      }, 400);
     };
     img.onerror = function () { setStatus("That file isn't an image we can read.", "err"); };
     img.src = objectUrl;

@@ -123,7 +123,11 @@ module.exports = async function handler(req, res) {
       format: "PKBarcodeFormatQR",
       message: code,
       messageEncoding: "iso-8859-1",
+      altText: code, // number printed under the QR, like the Union app
     });
+
+    // Show the student ID number on the front of the pass.
+    pass.secondaryFields.push({ key: "studentId", label: "STUDENT ID", value: code });
 
     const buffer = pass.getAsBuffer();
     await countPass();

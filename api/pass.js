@@ -99,7 +99,7 @@ module.exports = async function handler(req, res) {
 
   const code = readCode(req);
   if (!CODE_PATTERN.test(code)) {
-    return sendError(res, 400, "That QR code doesn't look like a dining hall code. Try a clearer screenshot.");
+    return sendError(res, 400, "That QR code doesn't look like a Union ID code. Try a clearer screenshot.");
   }
 
   try {
@@ -125,9 +125,6 @@ module.exports = async function handler(req, res) {
       messageEncoding: "iso-8859-1",
       altText: code, // number printed under the QR, like the Union app
     });
-
-    // Show the student ID number on the front of the pass.
-    pass.secondaryFields.push({ key: "studentId", label: "STUDENT ID", value: code });
 
     const buffer = pass.getAsBuffer();
     await countPass();

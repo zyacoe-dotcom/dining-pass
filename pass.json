@@ -2,8 +2,8 @@
   "formatVersion": 1,
   "passTypeIdentifier": "pass.com.example.diningpass",
   "teamIdentifier": "XXXXXXXXXX",
-  "organizationName": "Union Dining Pass",
-  "description": "Campus dining QR pass",
+  "organizationName": "Union ID",
+  "description": "Union ID QR pass",
   "backgroundColor": "rgb(153, 0, 38)",
   "foregroundColor": "rgb(255, 255, 255)",
   "labelColor": "rgb(255, 205, 215)",
@@ -12,8 +12,8 @@
     "primaryFields": [
       {
         "key": "title",
-        "label": "SCAN AT",
-        "value": "Union Dining"
+        "label": "SCAN FOR",
+        "value": "Dining, Chapel & more"
       }
     ],
     "backFields": [

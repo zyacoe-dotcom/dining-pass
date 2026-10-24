@@ -72,12 +72,52 @@ function fromEnv(name) {
   return Buffer.from(v, "base64");
 }
 
-function readCode(req) {
+function readBody(req) {
   let body = req.body;
   if (typeof body === "string") body = Object.fromEntries(new URLSearchParams(body));
   if (Buffer.isBuffer(body)) body = Object.fromEntries(new URLSearchParams(body.toString()));
-  const code = body && typeof body.code === "string" ? body.code.trim() : "";
-  return code;
+  return body || {};
+}
+
+function readCode(req) {
+  const body = readBody(req);
+  return typeof body.code === "string" ? body.code.trim() : "";
+}
+
+// Optional style for the demo page. Only names in themes/themes.json are accepted.
+const THEMES = JSON.parse(fs.readFileSync(path.join(process.cwd(), "themes", "themes.json"), "utf8"));
+
+function readTheme(req) {
+  const t = readBody(req).theme;
+  return typeof t === "string" && Object.prototype.hasOwnProperty.call(THEMES, t) ? t : null;
+}
+
+// A themed pass is a store card, so the artwork can sit in Wallet's strip image.
+function loadThemedModel(key) {
+  const t = THEMES[key];
+  const dir = path.join(process.cwd(), "themes", key);
+  const buffers = {};
+  for (const name of ["icon.png", "icon@2x.png", "icon@3x.png"]) {
+    buffers[name] = fs.readFileSync(path.join(process.cwd(), name));
+  }
+  for (const name of ["logo.png", "logo@2x.png", "logo@3x.png", "strip.png", "strip@2x.png", "strip@3x.png"]) {
+    buffers[name] = fs.readFileSync(path.join(dir, name));
+  }
+  const base = JSON.parse(fs.readFileSync(path.join(process.cwd(), "pass.json"), "utf8"));
+  const passJson = {
+    formatVersion: 1,
+    passTypeIdentifier: base.passTypeIdentifier,
+    teamIdentifier: base.teamIdentifier,
+    organizationName: "Union ID",
+    description: t.title ? `Union ID, ${t.title}` : "Union ID",
+    backgroundColor: t.backgroundColor,
+    foregroundColor: "rgb(255, 255, 255)",
+    labelColor: "rgb(255, 255, 255)",
+    sharingProhibited: true,
+    storeCard: { backFields: base.generic.backFields },
+  };
+  buffers["pass.json"] = Buffer.from(JSON.stringify(passJson));
+  return buffers;
 }
 
 function sendError(res, status, message) {
@@ -103,8 +143,9 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    const theme = readTheme(req);
     const pass = new PKPass(
-      loadModel(),
+      theme ? loadThemedModel(theme) : loadModel(),
       {
         wwdr: fromEnv("WWDR_CERT"),
         signerCert: fromEnv("SIGNER_CERT"),

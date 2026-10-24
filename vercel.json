@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/pass.js": {
-      "includeFiles": "{pass.json,icon.png,icon@2x.png,icon@3x.png,logo.png,logo@2x.png,logo@3x.png}"
+      "includeFiles": "{pass.json,icon.png,icon@2x.png,icon@3x.png,logo.png,logo@2x.png,logo@3x.png,themes/**}"
     }
   },
   "headers": [

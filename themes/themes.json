@@ -1,0 +1,121 @@
+{
+  "classic": {
+    "name": "Union",
+    "group": "Union",
+    "title": "",
+    "backgroundColor": "rgb(153, 0, 38)",
+    "bg": "#990026"
+  },
+  "christmas": {
+    "name": "Christmas",
+    "group": "Holidays",
+    "title": "Merry Christmas",
+    "backgroundColor": "rgb(18, 63, 37)",
+    "bg": "#123f25"
+  },
+  "halloween": {
+    "name": "Halloween",
+    "group": "Holidays",
+    "title": "Happy Halloween",
+    "backgroundColor": "rgb(23, 18, 15)",
+    "bg": "#17120f"
+  },
+  "football": {
+    "name": "Football",
+    "group": "Sports",
+    "title": "Go Bulldogs",
+    "backgroundColor": "rgb(20, 20, 20)",
+    "bg": "#141414"
+  },
+  "basketball": {
+    "name": "Basketball",
+    "group": "Sports",
+    "title": "Hoops Season",
+    "backgroundColor": "rgb(138, 47, 14)",
+    "bg": "#8a2f0e"
+  },
+  "baseball": {
+    "name": "Baseball",
+    "group": "Sports",
+    "title": "Play Ball",
+    "backgroundColor": "rgb(22, 50, 79)",
+    "bg": "#16324f"
+  },
+  "softball": {
+    "name": "Softball",
+    "group": "Sports",
+    "title": "Softball",
+    "backgroundColor": "rgb(28, 37, 65)",
+    "bg": "#1c2541"
+  },
+  "soccer": {
+    "name": "Soccer",
+    "group": "Sports",
+    "title": "Soccer",
+    "backgroundColor": "rgb(30, 86, 49)",
+    "bg": "#1e5631"
+  },
+  "volleyball": {
+    "name": "Volleyball",
+    "group": "Sports",
+    "title": "Volleyball",
+    "backgroundColor": "rgb(29, 53, 87)",
+    "bg": "#1d3557"
+  },
+  "golf": {
+    "name": "Golf",
+    "group": "Sports",
+    "title": "Golf",
+    "backgroundColor": "rgb(45, 90, 39)",
+    "bg": "#2d5a27"
+  },
+  "frisbee": {
+    "name": "Frisbee",
+    "group": "Sports",
+    "title": "Ultimate Frisbee",
+    "backgroundColor": "rgb(15, 118, 110)",
+    "bg": "#0f766e"
+  },
+  "lca": {
+    "name": "Lambda Chi Alpha",
+    "group": "Greek life",
+    "title": "Lambda Chi Alpha",
+    "backgroundColor": "rgb(79, 47, 125)",
+    "bg": "#4f2f7d"
+  },
+  "sae": {
+    "name": "SAE",
+    "group": "Greek life",
+    "title": "Sigma Alpha Epsilon",
+    "backgroundColor": "rgb(79, 54, 120)",
+    "bg": "#4f3678"
+  },
+  "ato": {
+    "name": "ATO",
+    "group": "Greek life",
+    "title": "Alpha Tau Omega",
+    "backgroundColor": "rgb(31, 95, 168)",
+    "bg": "#1f5fa8"
+  },
+  "zta": {
+    "name": "Zeta",
+    "group": "Greek life",
+    "title": "Zeta Tau Alpha",
+    "backgroundColor": "rgb(0, 124, 137)",
+    "bg": "#007c89"
+  },
+  "chio": {
+    "name": "Chi Omega",
+    "group": "Greek life",
+    "title": "Chi Omega",
+    "backgroundColor": "rgb(140, 29, 44)",
+    "bg": "#8c1d2c"
+  },
+  "kd": {
+    "name": "Kappa Delta",
+    "group": "Greek life",
+    "title": "Kappa Delta",
+    "backgroundColor": "rgb(79, 91, 46)",
+    "bg": "#4f5b2e"
+  }
+}
